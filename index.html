@@ -56,8 +56,15 @@ section h2{font-size:13px;letter-spacing:.12em;text-transform:uppercase;color:va
 .card h3{margin:0 0 6px;font-size:16px}
 .card p{margin:0;color:var(--muted);font-size:14px}
 .card .lang{display:block;margin-top:10px;font-size:12px;color:var(--accent)}
-.books{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:18px}
-.book{display:block;color:inherit}
+.carousel{position:relative}
+.books{display:flex;gap:18px;overflow-x:auto;scroll-snap-type:x mandatory;scroll-behavior:smooth;padding-bottom:8px;scrollbar-width:none;-webkit-overflow-scrolling:touch}
+.books::-webkit-scrollbar{display:none}
+.book{display:block;color:inherit;flex:0 0 150px;scroll-snap-align:start}
+.car-btn{position:absolute;top:calc(50% - 40px);z-index:2;width:36px;height:36px;border-radius:50%;border:1px solid var(--line);background:var(--card);color:var(--fg);font-size:18px;line-height:1;cursor:pointer;display:flex;align-items:center;justify-content:center}
+.car-btn:hover{border-color:var(--accent);color:var(--accent)}
+.car-btn.prev{left:-12px}.car-btn.next{right:-12px}
+.car-btn[disabled]{opacity:.3;cursor:default}
+@media(max-width:600px){.car-btn{display:none}.book{flex-basis:130px}}
 .book:hover{text-decoration:none}
 .book:hover .cover{border-color:var(--accent)}
 .book b{display:block;margin-top:10px;font-size:15px;line-height:1.3}
@@ -182,6 +189,9 @@ function cover(img){
 
   <section id="books">
     <h2>Books I read</h2>
+    <div class="carousel">
+    <button class="car-btn prev" aria-label="Previous books" type="button">&#8249;</button>
+    <button class="car-btn next" aria-label="Next books" type="button">&#8250;</button>
     <div class="books">
       <a class="book" href="https://www.goodreads.com/book/show/6900.Tuesdays_with_Morrie" data-title="Tuesdays with Morrie" data-author="Mitch Albom" target="_blank" rel="noopener">
         <span class="cover"><span class="ct">Tuesdays with Morrie</span><img src="https://covers.openlibrary.org/b/isbn/9780767905923-M.jpg?default=false" alt="Cover of Tuesdays with Morrie" loading="lazy" onerror="cover(this)"><span class="now">Reading now</span></span>
@@ -236,7 +246,19 @@ function cover(img){
         <b>One Night @ the Call Center</b><span>Chetan Bhagat</span>
       </a>
     </div>
+    </div>
     <p class="note">Covers via Open Library.</p>
+    <script>
+    (function(){
+      var c=document.querySelector('.carousel'); if(!c) return;
+      var t=c.querySelector('.books'), p=c.querySelector('.prev'), n=c.querySelector('.next');
+      function step(){return Math.max(t.clientWidth*0.8,168)}
+      function upd(){p.disabled=t.scrollLeft<=2; n.disabled=t.scrollLeft+t.clientWidth>=t.scrollWidth-2}
+      p.addEventListener('click',function(){t.scrollBy({left:-step()})});
+      n.addEventListener('click',function(){t.scrollBy({left:step()})});
+      t.addEventListener('scroll',upd,{passive:true}); window.addEventListener('resize',upd); upd();
+    })();
+    </script>
   </section>
 
   <section>
